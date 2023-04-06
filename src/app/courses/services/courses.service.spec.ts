@@ -1,7 +1,7 @@
 import { TestBed, inject } from "@angular/core/testing";
 import {HttpClientTestingModule, HttpTestingController} from "@angular/common/http/testing"
 import { CoursesService } from "./courses.service"
-import { COURSES } from "../../../../server/db-data";
+import { COURSES, findLessonsForCourse } from "../../../../server/db-data";
 import { Course } from "../model/course";
 import { HttpErrorResponse } from "@angular/common/http";
 
@@ -119,6 +119,29 @@ describe("CourseService", ()=>{
         expect(req.request.method).toEqual('PUT')
 
         req.flush('Save course have failed', {status:500, statusText:"Internal Server Error"})
+    })
+
+    it('should find a list of lessons', ()=>{
+        coursesService.findLessons(12).subscribe( lessons => {
+
+            expect(lessons).toBeTruthy()
+
+            expect(lessons.length).toBe(3)
+        })
+
+        const req = httpTestingController.expectOne(req => req.url == '/api/lessons' )
+    
+        expect(req.request.method).toEqual('GET')
+        expect(req.request.params.get("courseId")).toEqual("12")
+        expect(req.request.params.get("filter")).toEqual("")
+        expect(req.request.params.get("sortOrder")).toEqual("asc")
+        expect(req.request.params.get("pageNumber")).toEqual("0")
+        expect(req.request.params.get("pageSize")).toEqual("3")
+
+        req.flush({
+            payload: findLessonsForCourse(12).slice(0,3)
+        })
+    
     })
 
     afterEach(()=>{
