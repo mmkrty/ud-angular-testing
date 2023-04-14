@@ -1,10 +1,11 @@
+import { filter } from 'rxjs/operators';
+import { CoursesService } from './../services/courses.service';
 import {async, ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, waitForAsync} from '@angular/core/testing';
 import {CoursesModule} from '../courses.module';
 import {DebugElement} from '@angular/core';
 
 import {HomeComponent} from './home.component';
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
-import {CoursesService} from '../services/courses.service';
 import {HttpClient} from '@angular/common/http';
 import {COURSES} from '../../../../server/db-data';
 import {setupCourses} from '../common/setup-test-data';
@@ -22,6 +23,10 @@ describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
   let component:HomeComponent;
   let el: DebugElement;
+  let coursesService: any;
+
+  const beginnerCourses = setupCourses().filter(course => course.category == "BEGINNER");
+  const advancedCourses = setupCourses().filter(course => course.category == "ADVANCED");
 
   beforeEach (waitForAsync((() => {
 
@@ -40,6 +45,7 @@ describe('HomeComponent', () => {
       fixture = TestBed.createComponent(HomeComponent)
       component = fixture.componentInstance;
       el = fixture.debugElement;
+      coursesService = TestBed.get(CoursesService)
     })
 
     })
@@ -54,21 +60,39 @@ describe('HomeComponent', () => {
 
   it("should display only beginner courses", () => {
 
-    pending();
+    coursesService.findAllCourses.and.returnValue(of(beginnerCourses))
+    
+    fixture.detectChanges();
+
+    const tabs = el.queryAll(By.css(".mdc-tab"));
+
+    expect(tabs.length).toBe(1, "Unexpected number of tabs");
 
   });
 
 
   it("should display only advanced courses", () => {
 
-      pending();
+    coursesService.findAllCourses.and.returnValue(of(advancedCourses))
+    
+    fixture.detectChanges();
+
+    const tabs = el.queryAll(By.css(".mdc-tab"));
+
+    expect(tabs.length).toBe(1, "Unexpected number of tabs");
 
   });
 
 
   it("should display both tabs", () => {
 
-    pending();
+    coursesService.findAllCourses.and.returnValue(of(setupCourses()))
+    
+    fixture.detectChanges();
+
+    const tabs = el.queryAll(By.css(".mdc-tab"));
+
+    expect(tabs.length).toBe(2, "Unexpected number of tabs");
 
   });
 
