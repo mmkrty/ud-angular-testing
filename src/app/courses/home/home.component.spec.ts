@@ -60,9 +60,7 @@ describe('HomeComponent', () => {
 
   it("should display only beginner courses", () => {
 
-    coursesService.findAllCourses.and.returnValue(of(beginnerCourses))
-    
-    fixture.detectChanges();
+    loadCourses(beginnerCourses)
 
     const tabs = el.queryAll(By.css(".mdc-tab"));
 
@@ -73,9 +71,7 @@ describe('HomeComponent', () => {
 
   it("should display only advanced courses", () => {
 
-    coursesService.findAllCourses.and.returnValue(of(advancedCourses))
-    
-    fixture.detectChanges();
+    loadCourses(advancedCourses)
 
     const tabs = el.queryAll(By.css(".mdc-tab"));
 
@@ -85,10 +81,7 @@ describe('HomeComponent', () => {
 
 
   it("should display both tabs", () => {
-
-    coursesService.findAllCourses.and.returnValue(of(setupCourses()))
-    
-    fixture.detectChanges();
+    loadCourses()
 
     const tabs = el.queryAll(By.css(".mdc-tab"));
 
@@ -99,9 +92,26 @@ describe('HomeComponent', () => {
 
   it("should display advanced courses when tab clicked", () => {
 
-    pending();
+    loadCourses();
+
+    const tabs = el.queryAll(By.css(".mdc-tab"));
+
+    click(tabs[1]);
+
+    fixture.detectChanges();
+
+    const cardTitles = el.queryAll(By.css('.mat-mdc-card-title'));
+
+    expect(cardTitles.length).toBeGreaterThan(0);
+
+    expect(cardTitles[0].nativeElement.textContent).toContain("Angular security Course")
 
   });
+
+  const loadCourses = (courses = setupCourses()) =>{
+    coursesService.findAllCourses.and.returnValue(of(courses))
+    fixture.detectChanges();
+  }
 
 });
 
