@@ -90,7 +90,7 @@ describe('HomeComponent', () => {
   });
 
 
-  it("should display advanced courses when tab clicked", () => {
+  it("should display advanced courses when tab clicked", (done: DoneFn) => {
 
     loadCourses();
 
@@ -100,13 +100,44 @@ describe('HomeComponent', () => {
 
     fixture.detectChanges();
 
-    const cardTitles = el.queryAll(By.css('.mat-mdc-card-title'));
+    setTimeout(() => {
 
-    expect(cardTitles.length).toBeGreaterThan(0);
+      console.log(tabs[1].nativeElement.textContent)
 
-    expect(cardTitles[0].nativeElement.textContent).toContain("Angular security Course")
+      const cardTitles = el.queryAll(By.css('.mat-mdc-tab-body-active .mat-mdc-card-title'));
+
+      expect(cardTitles.length).toBeGreaterThan(0);
+
+      expect(cardTitles[0].nativeElement.textContent).toContain("Angular Security Course");
+
+      done()
+      
+    }, 500)
+
 
   });
+
+  it("should display advanced courses when tab clicked - fakeAsync", fakeAsync(() => {
+
+    loadCourses()
+
+    const tabs = el.queryAll(By.css(".mdc-tab"));
+
+    click(tabs[1]);
+
+    fixture.detectChanges();
+
+    flush();
+
+    const cardTitles = el.queryAll(By.css('.mat-mdc-tab-body-active .mat-mdc-card-title'));
+
+    console.log(cardTitles);
+
+    expect(cardTitles.length).toBeGreaterThan(0,"Could not find card titles");
+
+    expect(cardTitles[0].nativeElement.textContent).toContain("Angular Security Course");
+
+}));
 
   const loadCourses = (courses = setupCourses()) =>{
     coursesService.findAllCourses.and.returnValue(of(courses))
